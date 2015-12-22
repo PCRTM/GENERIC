@@ -218,6 +218,22 @@ CONTAINS
 
 !!$    * absorption and regression coefficient files associated with senor id 13-25 are obtained using lblrtm v-12.2;
 
+!!$      'IASI'                    26    
+!!$      'AIRS'                    27
+!!$      'High-resolution CRISBLK' 28
+!!$      'High-resolution CRISBOX' 29
+!!$      'High-resolution CRISHAM' 30
+!!$      'NAST-I BOX'              31
+!!$      'NAST-I KSR'              32
+!!$      'SHIS BOX'                33
+!!$      'SHIS KSR'                34
+!!$      'CRIS BOX'                35
+!!$      'CRIS HAM'                36
+!!$      'CRIS BLK'                37
+
+!!$    * absorption and regression coefficient files associated with senor id 13-25 are obtained using lblrtm v-12.2;
+    
+
      INTEGER,                  INTENT (IN)  :: SENSOR_ID
      TYPE(PCRTM_ATM_ABS_STRUCT_TYPE), &
                                INTENT (OUT) :: PCRTM_STND
@@ -299,67 +315,123 @@ CONTAINS
      WAT_TAB(13)    = 'INPUTDIR/CLD_LUT/wat_nasti_rt2065.dat'
      PARFILE(13)    = 'INPUTDIR/EOF_COEF/nasti_pccoef_44_bnds'
 
-     ABSCOEFFILE(14)= 'INPUTDIR/ABS_COEF/iasi_abscoef_solar'
+     ABSCOEFFILE(15)= 'INPUTDIR/ABS_COEF/airs_abscoef_v2'
+     ICE_TAB(15)    = 'INPUTDIR/CLD_LUT/ice_rt_493_airs_v2.dat'
+     WAT_TAB(15)    = 'INPUTDIR/CLD_LUT/wat_rt_493_airs_v2.dat'
+     PARFILE(15)    = 'INPUTDIR/EOF_COEF/airs_pccoef_v2'     
+     
+     ABSCOEFFILE(16)= 'INPUTDIR/ABS_COEF/crishrblk_abscoef_v2'
+     ICE_TAB(16)    = 'INPUTDIR/CLD_LUT/ice_rt_525_crishr_v2.dat'
+     WAT_TAB(16)    = 'INPUTDIR/CLD_LUT/wat_rt_525_crishr_v2.dat'
+     PARFILE(16)    = 'INPUTDIR/EOF_COEF/crishrblk_pccoef_v2'   
+
+     ABSCOEFFILE(17)= 'INPUTDIR/ABS_COEF/crishrbox_abscoef_v2'
+     ICE_TAB(17)    = 'INPUTDIR/CLD_LUT/ice_rt_588_crishrbox_v2.dat'
+     WAT_TAB(17)    = 'INPUTDIR/CLD_LUT/wat_rt_588_crishrbox_v2.dat'
+     PARFILE(17)    = 'INPUTDIR/EOF_COEF/crishrbox_pccoef_v2'      
+
+     ABSCOEFFILE(18)= 'INPUTDIR/ABS_COEF/crishrham_abscoef_v3'
+     ICE_TAB(18)    = 'INPUTDIR/CLD_LUT/ice_rt_525_crishr_v2.dat'
+     WAT_TAB(18)    = 'INPUTDIR/CLD_LUT/wat_rt_525_crishr_v2.dat'
+     PARFILE(18)    = 'INPUTDIR/EOF_COEF/crishrham_pccoef_v2'
+
+     ABSCOEFFILE(19)= 'INPUTDIR/ABS_COEF/nastibox_abscoef_v2'
+     ICE_TAB(19)    = 'INPUTDIR/CLD_LUT/ice_rt_828_nastibox_v2.dat'
+     WAT_TAB(19)    = 'INPUTDIR/CLD_LUT/wat_rt_828_nastibox_v2.dat'
+     PARFILE(19)    = 'INPUTDIR/EOF_COEF/nastibox_pccoef_v2'
+
+     ABSCOEFFILE(20)= 'INPUTDIR/ABS_COEF/nastiksr_abscoef_v2'
+     ICE_TAB(20)    = 'INPUTDIR/CLD_LUT/ice_rt_664_nastiksr_v2.dat'
+     WAT_TAB(20)    = 'INPUTDIR/CLD_LUT/wat_rt_664_nastiksr_v2.dat'
+     PARFILE(20)    = 'INPUTDIR/EOF_COEF/nastiksr_pccoef_v2'
+
+     ABSCOEFFILE(21)= 'INPUTDIR/ABS_COEF/shisbox_abscoef_v2'
+     ICE_TAB(21)    = 'INPUTDIR/CLD_LUT/ice_rt_579_shisbox_v2.dat'
+     WAT_TAB(21)    = 'INPUTDIR/CLD_LUT/wat_rt_579_shisbox_v2.dat'
+     PARFILE(21)    = 'INPUTDIR/EOF_COEF/shisbox_pccoef_v2'
+
+     ABSCOEFFILE(22)= 'INPUTDIR/ABS_COEF/shisksr_abscoef_v2'
+     ICE_TAB(22)    = 'INPUTDIR/CLD_LUT/ice_rt_540_shisksr_v2.dat'
+     WAT_TAB(22)    = 'INPUTDIR/CLD_LUT/wat_rt_540_shisksr_v2.dat'
+     PARFILE(22)    = 'INPUTDIR/EOF_COEF/shisksr_pccoef_v2'
+
+     ABSCOEFFILE(23)= 'INPUTDIR/ABS_COEF/crisbox_abscoef_v2'
+     ICE_TAB(23)    = 'INPUTDIR/CLD_LUT/ice_rt_501_crisbox_v2.dat'
+     WAT_TAB(23)    = 'INPUTDIR/CLD_LUT/wat_rt_501_crisbox_v2.dat'
+     PARFILE(23)    = 'INPUTDIR/EOF_COEF/crisbox_pccoef_v2'      
+
+     ABSCOEFFILE(24)= 'INPUTDIR/ABS_COEF/crisham_abscoef_v2'
+     ICE_TAB(24)    = 'INPUTDIR/CLD_LUT/ice_rt_466_cris_v2.dat'
+     WAT_TAB(24)    = 'INPUTDIR/CLD_LUT/wat_rt_466_cris_v2.dat'
+     PARFILE(24)    = 'INPUTDIR/EOF_COEF/crisham_pccoef_v2'    
+
+     ABSCOEFFILE(25)= 'INPUTDIR/ABS_COEF/crisblk_abscoef_v2'
+     ICE_TAB(25)    = 'INPUTDIR/CLD_LUT/ice_rt_466_cris_v2.dat'
+     WAT_TAB(25)    = 'INPUTDIR/CLD_LUT/wat_rt_466_cris_v2.dat'
+     PARFILE(25)    = 'INPUTDIR/EOF_COEF/crisblk_pccoef_v2'       
+     
+
+     ABSCOEFFILE(26)= 'INPUTDIR/ABS_COEF/iasi_abscoef_solar'
      ICE_TAB(14)    = 'INPUTDIR/CLD_LUT/ice_rt_753_iasi_solar.dat'
      WAT_TAB(14)    = 'INPUTDIR/CLD_LUT/wat_rt_753_iasi_solar.dat'
      PARFILE(14)    = 'INPUTDIR/EOF_COEF/iasi_pccoef_solar'     
 
-     ABSCOEFFILE(15)= 'INPUTDIR/ABS_COEF/airs_abscoef_solar'
+     ABSCOEFFILE(27)= 'INPUTDIR/ABS_COEF/airs_abscoef_solar'
      ICE_TAB(15)    = 'INPUTDIR/CLD_LUT/ice_rt_500_airs_solar.dat'
      WAT_TAB(15)    = 'INPUTDIR/CLD_LUT/wat_rt_500_airs_solar.dat'
      PARFILE(15)    = 'INPUTDIR/EOF_COEF/airs_pccoef_solar'     
      
-     ABSCOEFFILE(16)= 'INPUTDIR/ABS_COEF/crishrblk_abscoef_solar'
+     ABSCOEFFILE(28)= 'INPUTDIR/ABS_COEF/crishrblk_abscoef_solar'
      ICE_TAB(16)    = 'INPUTDIR/CLD_LUT/ice_rt_374_crishr_blk_solar.dat'
      WAT_TAB(16)    = 'INPUTDIR/CLD_LUT/wat_rt_374_crishr_blk_solar.dat'
      PARFILE(16)    = 'INPUTDIR/EOF_COEF/crishrblk_pccoef_solar'   
 
-     ABSCOEFFILE(17)= 'INPUTDIR/ABS_COEF/crishrbox_abscoef_solar'
+     ABSCOEFFILE(29)= 'INPUTDIR/ABS_COEF/crishrbox_abscoef_solar'
      ICE_TAB(17)    = 'INPUTDIR/CLD_LUT/ice_rt_540_crishr_box_solar.dat'
      WAT_TAB(17)    = 'INPUTDIR/CLD_LUT/wat_rt_540_crishr_box_solar.dat'
      PARFILE(17)    = 'INPUTDIR/EOF_COEF/crishrbox_pccoef_solar'      
 
-     ABSCOEFFILE(18)= 'INPUTDIR/ABS_COEF/crishrham_abscoef_solar'
+     ABSCOEFFILE(30)= 'INPUTDIR/ABS_COEF/crishrham_abscoef_solar'
      ICE_TAB(18)    = 'INPUTDIR/CLD_LUT/ice_rt_398_crishr_ham_solar.dat'
      WAT_TAB(18)    = 'INPUTDIR/CLD_LUT/wat_rt_398_crishr_ham_solar.dat'
      PARFILE(18)    = 'INPUTDIR/EOF_COEF/crishrham_pccoef_solar'
 
-     ABSCOEFFILE(19)= 'INPUTDIR/ABS_COEF/nastibox_abscoef_solar'
+     ABSCOEFFILE(31)= 'INPUTDIR/ABS_COEF/nastibox_abscoef_solar'
      ICE_TAB(19)    = 'INPUTDIR/CLD_LUT/ice_rt_748_nasti_box_solar.dat'
      WAT_TAB(19)    = 'INPUTDIR/CLD_LUT/wat_rt_748_nasti_box_solar.dat'
      PARFILE(19)    = 'INPUTDIR/EOF_COEF/nastibox_pccoef_solar'
 
-     ABSCOEFFILE(20)= 'INPUTDIR/ABS_COEF/nastiksr_abscoef_solar'
+     ABSCOEFFILE(32)= 'INPUTDIR/ABS_COEF/nastiksr_abscoef_solar'
      ICE_TAB(20)    = 'INPUTDIR/CLD_LUT/ice_rt_559_nasti_ksr_solar.dat'
      WAT_TAB(20)    = 'INPUTDIR/CLD_LUT/wat_rt_559_nasti_ksr_solar.dat'
      PARFILE(20)    = 'INPUTDIR/EOF_COEF/nastiksr_pccoef_solar'
 
-     ABSCOEFFILE(21)= 'INPUTDIR/ABS_COEF/shisbox_abscoef_solar'
+     ABSCOEFFILE(33)= 'INPUTDIR/ABS_COEF/shisbox_abscoef_solar'
      ICE_TAB(21)    = 'INPUTDIR/CLD_LUT/ice_rt_647_shis_box_solar.dat'
      WAT_TAB(21)    = 'INPUTDIR/CLD_LUT/wat_rt_647_shis_box_solar.dat'
      PARFILE(21)    = 'INPUTDIR/EOF_COEF/shisbox_pccoef_solar'
 
-     ABSCOEFFILE(22)= 'INPUTDIR/ABS_COEF/shisksr_abscoef_solar'
+     ABSCOEFFILE(34)= 'INPUTDIR/ABS_COEF/shisksr_abscoef_solar'
      ICE_TAB(22)    = 'INPUTDIR/CLD_LUT/ice_rt_647_shis_ksr_solar.dat'
      WAT_TAB(22)    = 'INPUTDIR/CLD_LUT/wat_rt_647_shis_ksr_solar.dat'
      PARFILE(22)    = 'INPUTDIR/EOF_COEF/shisksr_pccoef_solar'
 
-     ABSCOEFFILE(23)= 'INPUTDIR/ABS_COEF/crisbox_abscoef_solar'
+     ABSCOEFFILE(35)= 'INPUTDIR/ABS_COEF/crisbox_abscoef_solar'
      ICE_TAB(23)    = 'INPUTDIR/CLD_LUT/ice_rt_485_cris_box_solar.dat'
      WAT_TAB(23)    = 'INPUTDIR/CLD_LUT/wat_rt_485_cris_box_solar.dat'
      PARFILE(23)    = 'INPUTDIR/EOF_COEF/crisbox_pccoef_solar'      
 
-     ABSCOEFFILE(24)= 'INPUTDIR/ABS_COEF/crisham_abscoef_solar'
+     ABSCOEFFILE(36)= 'INPUTDIR/ABS_COEF/crisham_abscoef_solar'
      ICE_TAB(24)    = 'INPUTDIR/CLD_LUT/ice_rt_384_cris_ham_solar.dat'
      WAT_TAB(24)    = 'INPUTDIR/CLD_LUT/wat_rt_384_cris_ham_solar.dat'
      PARFILE(24)    = 'INPUTDIR/EOF_COEF/crisham_pccoef_solar'    
 
-     ABSCOEFFILE(25)= 'INPUTDIR/ABS_COEF/crisblk_abscoef_solar'
+     ABSCOEFFILE(37)= 'INPUTDIR/ABS_COEF/crisblk_abscoef_solar'
      ICE_TAB(25)    = 'INPUTDIR/CLD_LUT/ice_rt_369_cris_blk_solar.dat'
      WAT_TAB(25)    = 'INPUTDIR/CLD_LUT/wat_rt_369_cris_blk_solar.dat'
      PARFILE(25)    = 'INPUTDIR/EOF_COEF/crisblk_pccoef_solar'       
 
-     ABSCOEFFILE(26)= 'INPUTDIR/ABS_COEF/clarreo_abscoef_0.5'
+     ABSCOEFFILE(38)= 'INPUTDIR/ABS_COEF/clarreo_abscoef_0.5'
      ICE_TAB(26)    = 'INPUTDIR/CLD_LUT/ice_clarreo_0.5.dat'
      WAT_TAB(26)    = 'INPUTDIR/CLD_LUT/wat_clarreo_0.5.dat'
      PARFILE(26)    = 'INPUTDIR/EOF_COEF/clarreo_0.5_pccoef_5121'
