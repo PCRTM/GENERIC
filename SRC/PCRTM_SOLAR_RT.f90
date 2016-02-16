@@ -134,39 +134,26 @@ contains
     view_mu = COS(Geometry%satang*pi/180.0)
     mu0     = COS(Geometry%solar_zang*pi/180.0)
 
-!!$    CALL R_T_INTPOL(RT_SOLUTION%taugas_below(StartWaveIndex:),  &
-!!$                    CLD(1)%VISTAU,                              &
-!!$                    CLD(1)%De,                                  &
-!!$                    Geometry%solar_zang,                        &
-!!$                    Geometry%SATANG,                            &
-!!$                    view_phi,                                   &
-!!$                    cloud_type,                                 &
-!!$                    solar_freq,                                 &
-!!$                    start_freqgrid_index,                       &
-!!$                    end_freqgrid_index,                         &
-!!$                    numberfreqbins,                             &
-!!$                    BRDF, Rdd, Tbd, Tdb)
-
-
 !!!! Assign LUTs according to cloud type.
-    IF (cld(1)%phase == 1) THEN
-       CALL R_T_INTPOL(RT_SOLUTION,                        &
-                       NCLD,                               &
-                       CLD,                                &
-                       Geometry,                           &
-                       Solar_tab(1),                       &
-                       SOLAR_SOLUTION,                     &
-                       PCRTM_Stnd)
-    ELSE IF (cld(1)%phase == 2) THEN
-       CALL R_T_INTPOL(RT_SOLUTION,                        &
-                       NCLD,                               &
-                       CLD,                                &
-                       Geometry,                           &
-                       Solar_tab(2),                       &
-                       SOLAR_SOLUTION,                     &
-                       PCRTM_Stnd)
+    IF (NCLD .GT. 0) THEN
+       IF (cld(1)%phase == 1) THEN
+          CALL R_T_INTPOL(RT_SOLUTION,                        &
+                          NCLD,                               &
+                          CLD,                                &
+                          Geometry,                           &
+                          Solar_tab(1),                       &
+                          SOLAR_SOLUTION,                     &
+                          PCRTM_Stnd)
+       ELSE IF (cld(1)%phase == 2) THEN
+          CALL R_T_INTPOL(RT_SOLUTION,                        &
+                          NCLD,                               &
+                          CLD,                                &
+                          Geometry,                           &
+                          Solar_tab(2),                       &
+                          SOLAR_SOLUTION,                     &
+                          PCRTM_Stnd)
+       END IF
     END IF
-
     
     SOLAR_SOLUTION%SolarRadUp = 0.0
     DO iwave = 1, pcrtm_stnd%nM - StartWaveIndex + 1
@@ -188,18 +175,11 @@ contains
                exp(-tau_above/view_mu)*exp(-tau_above/mu0)
           SOLAR_SOLUTION%SolarRadUp(iwave) = 1000.0*mu0*SOLAR_SOLUTION%SolarSpectrum(iwave)*R_TOA/pi
        ENDIF
-!!$       write(*,*) wavenumber, SOLAR_SOLUTION%BRDF(iwave),albedo,SOLAR_SOLUTION%Tbd(iwave),&
-!!$            SOLAR_SOLUTION%Tdb(iwave),SOLAR_SOLUTION%Rdd(iwave)
     end DO
 
 
   end subroutine PCRTM_FORWARD_RT_M_SOLAR
 
-
-!!$  SUBROUTINE R_T_INTPOL(bottomskytau, ctau, De, SZA, VZA, VAA,       &
-!!$                      cloud_type, Wavenumber, start_freqgrid_index,&
-!!$                      end_freqgrid_index, numberfreqbins,          &
-!!$                      BRDF, Rdd, Tbd, Tdb)
 
   subroutine R_T_INTPOL(RT_SOLUTION,                    &
                         NCLD,                           &
