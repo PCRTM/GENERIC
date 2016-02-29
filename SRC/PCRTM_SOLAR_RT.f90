@@ -127,7 +127,7 @@ contains
     TYPE(PCRTM_GEOMETRY_TYPE),         INTENT(in)    :: Geometry
     type(PCRTM_SOLAR_LUT_DEF),         intent(in)    :: solar_tab(2)
     integer  ::  StartWaveIndex
-    real*4   ::  wavenumber, tau_above, tau_below
+    real*4   ::  wavenumber, tau_above, tau_below, tau
     real*8   ::  view_mu, mu0, albedo
 
     StartWaveIndex = SOLAR_SOLUTION%StartWaveIndex
@@ -162,19 +162,20 @@ contains
           PRINT *, 'Wavenumber must be larger than 1800 and smaller than 3000!'
           STOP
        ENDIF
-       tau_above = RT_SOLUTION%Taugas_above(iwave+StartWaveIndex-1)
-       tau_below = RT_SOLUTION%Taugas_below(iwave+StartWaveIndex-1)
+
        albedo    = (1.0 - RT_SOLUTION%EMIS(iwave+StartWaveIndex-1))*pi
        
        IF (NCLD .EQ. 0) THEN
-          R_TOA = albedo*exp(-(tau_above+tau_below)/inci_mu)*&
-               exp(-(tau_above+tau_below)/view_mu)
+          tau = sum(RT_SOLUTION%TAUlay(iwave+StartWaveIndex-1,:))+1e-20
+          R_TOA = albedo*exp(-tau/mu0)*exp(-tau/view_mu)
        ELSE
+          tau_above = RT_SOLUTION%Taugas_above(iwave+StartWaveIndex-1)+1e-20
+          tau_below = RT_SOLUTION%Taugas_below(iwave+StartWaveIndex-1)+1e-20
           R_TOA = (SOLAR_SOLUTION%BRDF(iwave) + albedo*SOLAR_SOLUTION%Tbd(iwave)&
                *SOLAR_SOLUTION%Tdb(iwave)/(1-albedo*SOLAR_SOLUTION%Rdd(iwave)/pi))*&
                exp(-tau_above/view_mu)*exp(-tau_above/mu0)
-          SOLAR_SOLUTION%SolarRadUp(iwave) = 1000.0*mu0*SOLAR_SOLUTION%SolarSpectrum(iwave)*R_TOA/pi
        ENDIF
+       SOLAR_SOLUTION%SolarRadUp(iwave) = 1000.0*mu0*SOLAR_SOLUTION%SolarSpectrum(iwave)*R_TOA/pi
     end DO
 
 
