@@ -163,7 +163,7 @@ contains
           STOP
        ENDIF
 
-       albedo    = (1.0 - RT_SOLUTION%EMIS(iwave+StartWaveIndex-1))*pi
+       albedo    = 1.0 - RT_SOLUTION%EMIS(iwave+StartWaveIndex-1)
        
        IF (NCLD .EQ. 0) THEN
           tau = sum(RT_SOLUTION%TAUlay(iwave+StartWaveIndex-1,:))+1e-20

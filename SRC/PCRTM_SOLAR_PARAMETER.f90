@@ -209,12 +209,42 @@ contains
     READ(lun,REC=1)solar_tab(1)%MTDBB
     CLOSE(lun)
     
-    
     solar_tab(2)%tau_lut =  solar_tab(1)%tau_lut
     solar_tab(2)%bottom_sky_tau_lut = solar_tab(1)%bottom_sky_tau_lut
     solar_tab(2)%de_lut  = (/4.0,8.0,12.0,16.0,20.0,24.0,28.0,32.0,36.0,40.,&
                             50.,60.,70.,80.,100.,120.,160.,200./)
-    
+    call getlun(lun)
+    ! Read BRDF !
+    WRITE(lutname, '(A)')'INPUTDIR/CLD_LUT/WC_Corrected_BRDF_M_A_1800_3000.dat'
+    OPEN(lun,FILE=lutname,FORM='unformatted',ACCESS='direct',RECL=maxtau*size_VZA*size_VAA*SBRDF*4)
+    READ(lun,REC=1)solar_tab(2)%MBRDFA
+    CLOSE(lun)
+    WRITE(lutname, '(A)')'INPUTDIR/CLD_LUT/WC_Corrected_BRDF_M_B_1800_3000.dat'
+    OPEN(lun,FILE=lutname,FORM='unformatted',ACCESS='direct',RECL=SBRDF*maxdef*size_SZA*maxwvl*4)
+    READ(lun,REC=1)solar_tab(2)%MBRDFB
+    CLOSE(lun)
+    ! read RDD
+    WRITE(lutname,'(A)')'INPUTDIR/CLD_LUT/Rdd_wc_20x30x18x121.dat'
+    OPEN(lun,FILE=lutname,FORM='unformatted',ACCESS='direct',RECL=maxskytau*maxtau*maxdef*maxwvl*4)
+    READ(lun,REC=1)solar_tab(2)%Rdd_lut
+    CLOSE(lun)
+    ! Read TBD and TDB LUTs !
+    WRITE(lutname,'(A)')'INPUTDIR/CLD_LUT/wc_Tbd_M_A_1800_3000.dat'
+    OPEN(lun,FILE=lutname,FORM='unformatted',ACCESS='direct',RECL=maxwvl*STbd*4)
+    READ(lun,REC=1)solar_tab(2)%MTBDA
+    CLOSE(lun)   
+    WRITE(lutname,'(A)')'INPUTDIR/CLD_LUT/wc_Tbd_M_B_1800_3000.dat'
+    OPEN(lun,FILE=lutname,FORM='unformatted',ACCESS='direct',RECL=STbd*maxskytau*maxtau*maxdef*size_SZA*4)
+    READ(lun,REC=1)solar_tab(2)%MTBDB
+    CLOSE(lun)
+    WRITE(lutname,'(A)')'INPUTDIR/CLD_LUT/wc_Tdb_M_A_1800_3000.dat'
+    OPEN(lun,FILE=lutname,FORM='unformatted',ACCESS='direct',RECL=maxwvl*STdb*4)
+    READ(lun,REC=1)solar_tab(2)%MTDBA
+    CLOSE(lun)   
+    WRITE(lutname,'(A)')'INPUTDIR/CLD_LUT/wc_Tdb_M_B_1800_3000.dat'
+    OPEN(lun,FILE=lutname,FORM='unformatted',ACCESS='direct',RECL=STdb*maxskytau*maxtau*maxdef*size_VZA*4)
+    READ(lun,REC=1)solar_tab(2)%MTDBB
+    CLOSE(lun)
     
   end subroutine INIT_solar_brdf_tab
 
