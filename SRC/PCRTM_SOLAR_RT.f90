@@ -126,34 +126,60 @@ contains
     TYPE(PCRTM_CLOUD_TYPE),            INTENT(in)    :: CLD(NCLD)
     TYPE(PCRTM_GEOMETRY_TYPE),         INTENT(in)    :: Geometry
     type(PCRTM_SOLAR_LUT_DEF),         intent(in)    :: solar_tab(2)
+
+    TYPE(PCRTM_CLOUD_TYPE)   :: CLD0(NCLD)
     integer  ::  StartWaveIndex
-    real*4   ::  wavenumber, tau_above, tau_below, tau
+    real*4   ::  wavenumber, tau_above, tau_below, tau,R_TOA,R_TOA0
     real*8   ::  view_mu, mu0, albedo
+    
 
     StartWaveIndex = SOLAR_SOLUTION%StartWaveIndex
     view_mu = COS(Geometry%satang*pi/180.0)
     mu0     = COS(Geometry%solar_zang*pi/180.0)
 
 !!!! Assign LUTs according to cloud type.
-    IF (NCLD .GT. 0) THEN
-       IF (cld(1)%phase == 1) THEN
-          CALL R_T_INTPOL(RT_SOLUTION,                        &
-                          NCLD,                               &
-                          CLD,                                &
-                          Geometry,                           &
-                          Solar_tab(1),                       &
-                          SOLAR_SOLUTION,                     &
-                          PCRTM_Stnd)
-       ELSE IF (cld(1)%phase == 2) THEN
-          CALL R_T_INTPOL(RT_SOLUTION,                        &
-                          NCLD,                               &
-                          CLD,                                &
-                          Geometry,                           &
-                          Solar_tab(2),                       &
-                          SOLAR_SOLUTION,                     &
-                          PCRTM_Stnd)
+    IF (NCLD .GT. 0) then
+       IF( cld(1)%vistau .ge. 1e-2) THEN
+          IF (cld(1)%phase == 1) THEN
+             CALL R_T_INTPOL(RT_SOLUTION,                        &
+                             NCLD,                               &
+                             CLD,                                &
+                             Geometry,                           &
+                             Solar_tab(1),                       &
+                             SOLAR_SOLUTION,                     &
+                             PCRTM_Stnd)
+          ELSE IF (cld(1)%phase == 2) THEN
+             CALL R_T_INTPOL(RT_SOLUTION,                        &
+                             NCLD,                               &
+                             CLD,                                &
+                             Geometry,                           &
+                             Solar_tab(2),                       &
+                             SOLAR_SOLUTION,                     &
+                             PCRTM_Stnd)
+          END IF
+       else
+          CLD0 = CLD
+          cld0(1)%vistau = 0.01
+          IF (cld(1)%phase == 1) THEN
+             CALL R_T_INTPOL(RT_SOLUTION,                        &
+                             NCLD,                               &
+                             CLD0,                               &
+                             Geometry,                           &
+                             Solar_tab(1),                       &
+                             SOLAR_SOLUTION,                     &
+                             PCRTM_Stnd)
+          ELSE IF (cld(1)%phase == 2) THEN
+             CALL R_T_INTPOL(RT_SOLUTION,                        &
+                             NCLD,                               &
+                             CLD0,                               &
+                             Geometry,                           &
+                             Solar_tab(2),                       &
+                             SOLAR_SOLUTION,                     &
+                             PCRTM_Stnd)
+          END IF
+          
        END IF
-    END IF
+    end IF
     
     SOLAR_SOLUTION%SolarRadUp = 0.0
     DO iwave = 1, pcrtm_stnd%nM - StartWaveIndex + 1
@@ -165,14 +191,23 @@ contains
 
        albedo    = 1.0 - RT_SOLUTION%EMIS(iwave+StartWaveIndex-1)
        
-       IF (NCLD .EQ. 0) THEN
+       IF (NCLD .EQ. 0) then
           tau = sum(RT_SOLUTION%TAUlay(iwave+StartWaveIndex-1,:))+1e-20
           R_TOA = albedo*exp(-tau/mu0)*exp(-tau/view_mu)
-       ELSE
+       else if (cld(1)%vistau .le. 1e-2) THEN
+          tau = sum(RT_SOLUTION%TAUlay(iwave+StartWaveIndex-1,:))+1e-20
+          R_TOA0 = albedo*exp(-tau/mu0)*exp(-tau/view_mu)
           tau_above = RT_SOLUTION%Taugas_above(iwave+StartWaveIndex-1)+1e-20
           tau_below = RT_SOLUTION%Taugas_below(iwave+StartWaveIndex-1)+1e-20
           R_TOA = (SOLAR_SOLUTION%BRDF(iwave) + albedo*SOLAR_SOLUTION%Tbd(iwave)&
                *SOLAR_SOLUTION%Tdb(iwave)/(1-albedo*SOLAR_SOLUTION%Rdd(iwave)/pi))*&
+               exp(-tau_above/view_mu)*exp(-tau_above/mu0)
+          R_TOA = R_TOA0+ (R_TOA-R_TOA0)*CLD(1)%vistau/0.01
+       ELSE
+          tau_above = RT_SOLUTION%Taugas_above(iwave+StartWaveIndex-1)+1e-20
+          tau_below = RT_SOLUTION%Taugas_below(iwave+StartWaveIndex-1)+1e-20
+          R_TOA = (SOLAR_SOLUTION%BRDF(iwave) + albedo*SOLAR_SOLUTION%Tbd(iwave)*&
+               SOLAR_SOLUTION%Tdb(iwave)/(1-albedo*SOLAR_SOLUTION%Rdd(iwave)/pi))*&
                exp(-tau_above/view_mu)*exp(-tau_above/mu0)
        ENDIF
        SOLAR_SOLUTION%SolarRadUp(iwave) = 1000.0*mu0*SOLAR_SOLUTION%SolarSpectrum(iwave)*R_TOA/pi
@@ -388,11 +423,8 @@ contains
                index1_VAA,index2_VAA, fraction_VAA,         &
                i, BRDF_Out,solar_tab)
           BRDF_grid(i) = BRDF_Out
-!!$          write(*,*)i,BRDF_grid(i)
        ENDIF
     ENDDO
-!!$print*, BRDF_grid
-!!$stop
     
     DO j = 1, maxskytau
        DO i = start_freqgrid_index, end_freqgrid_index
@@ -412,7 +444,6 @@ contains
                index1_VZA,index2_VZA, fraction_VZA,          &
                j, i, 2, Tdb_Out,solar_tab)
           Tdb_Grid(j,i) = Tdb_Out
-!!$          write(*,*)j,i,Rdd_Grid(j,i),Tdb_Grid(j,i),Tbd_Grid(j,i)
        ENDDO
     ENDDO
 
@@ -453,7 +484,6 @@ contains
        ENDIF
        fraction_bottomskytau = (bottomskytau(i)-solar_tab%bottom_sky_tau_lut(index1_bottomskytau))/&
             (solar_tab%bottom_sky_tau_lut(index2_bottomskytau)-solar_tab%bottom_sky_tau_lut(index1_bottomskytau))
-!!$       print*, 'fraction_bottomskytau',bottomskytau(i), index1_bottomskytau, index2_bottomskytau,fraction_bottomskytau
        
        CALL LIN_INT2(index1_bottomskytau,index2_bottomskytau,fraction_bottomskytau,&
             index1_wave, index2_wave, fraction_wave, Rdd_Out, end_freqgrid_index, Rdd_grid)
@@ -464,8 +494,6 @@ contains
        CALL LIN_INT2(index1_bottomskytau,index2_bottomskytau,fraction_bottomskytau,&
             index1_wave, index2_wave, fraction_wave, Tdb_Out, end_freqgrid_index, Tdb_grid)
        SOLAR_SOLUTION%Tdb(i) = Tdb_Out 
-!!$       print*,i, Wavenumber(i), index1_wave, index2_wave, fraction_wave, &
-!!$            SOLAR_SOLUTION%BRDF(i),SOLAR_SOLUTION%Rdd(i),SOLAR_SOLUTION%Tbd(i),SOLAR_SOLUTION%Tdb(i)
     EndDO
     
     deallocate( bottomskytau )

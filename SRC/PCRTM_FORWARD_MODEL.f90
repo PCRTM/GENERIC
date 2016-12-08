@@ -149,7 +149,8 @@ CONTAINS
     INTEGER                                   :: IM, K, I1
     TYPE(PCRTM_CLOUD_TYPE),       INTENT(OUT) :: CLD(NCLD)
     TYPE(PCRTM_CLD_JACOBIAN_TYPE),INTENT(OUT) :: K_CLD(NCLD)
-    
+
+   
 
     CALL PCRTM_GEOMETRY_INFO( GEOMETRY,             &
                         PCRTM_STND%PBND,            &
@@ -213,7 +214,7 @@ CONTAINS
                                        SOLAR_SOLUTION)
 
        rt_solution%radup(SOLAR_SOLUTION%StartWaveIndex:PCRTM_STND%nM) = SOLAR_SOLUTION%SolarRadUp + &
-                                        rt_solution%radup(SOLAR_SOLUTION%StartWaveIndex:PCRTM_STND%nM)  
+            rt_solution%radup(SOLAR_SOLUTION%StartWaveIndex:PCRTM_STND%nM)
 
     END IF
 
@@ -271,10 +272,22 @@ CONTAINS
     
     INTEGER                                         :: IB, NB
 
+    REAL*4                                    :: mu0
+
     NB = SIZE(EOF_SOLUTION)
 
     DO IB = 1,NB 
        CALL PRED2PCSCORE(RT_SOLUTION, EOF_SOLUTION(IB))
+       IF (GEOMETRY%pobs .lt. 20 .and. EOF_SOLUTION(IB)%FRQCH(EOF_SOLUTION(IB)%NCHBND) .gt. &
+            2215.0 .and. GEOMETRY%SOLAR_ZANG .lt. 90.0) then
+          write(*,*) 'calcualting nlte for band-------', IB
+          mu0 = cos(GEOMETRY%SOLAR_ZANG)
+          EOF_SOLUTION(IB)%radpc = EOF_SOLUTION(IB)%radpc + EOF_SOLUTION(IB)%nlte_coef(:,1) + &
+               EOF_SOLUTION(IB)%nlte_coef(:,2)*mu0 + EOF_SOLUTION(IB)%nlte_coef(:,3)*mu0*mu0+ &
+               EOF_SOLUTION(IB)%nlte_coef(:,4)*mu0/cos(GEOMETRY%satang) +                     &
+               EOF_SOLUTION(IB)%nlte_coef(:,5)*ATM%tlev(1) + EOF_SOLUTION(IB)%nlte_coef(:,6)* &
+               mu0 + EOF_SOLUTION(IB)%nlte_coef(:,7)*(ATM%tlev(1)-370.0)
+       end if
        IF(EOF_SOLUTION(IB)%CHDOMAIN) THEN
           CALL PCSCORE2CH(EOF_SOLUTION(IB))
        END IF

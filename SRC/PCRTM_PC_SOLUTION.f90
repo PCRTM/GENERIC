@@ -130,6 +130,7 @@ MODULE PCRTM_PC_SOLUTION
      REAL(SINGLE), ALLOCATABLE  :: RADCH(:)
      REAL(SINGLE), ALLOCATABLE  :: RADPC(:)
      REAL(SINGLE), ALLOCATABLE  :: BTCH(:)
+     REAL(SINGLE), ALLOCATABLE  :: NLTE_COEF(:,:)
   END TYPE PCRTM_EOF_SOLUTION_TYPE
 
 CONTAINS
@@ -159,6 +160,7 @@ CONTAINS
              EOF_SOLUTION%RADCH(NCHBND),                   &
              EOF_SOLUTION%RADPC(NPCBND),                   &
              EOF_SOLUTION%BTCH(NCHBND),                    &
+             EOF_SOLUTION%NLTE_COEF(NPCBND,7),             &
              STAT = ALLOC_STAT )                                  
     
     IF ( ALLOC_STAT /= 0 ) THEN
@@ -170,6 +172,7 @@ CONTAINS
     EOF_SOLUTION%REGCOEF       =  0
     EOF_SOLUTION%PC            =  0
     EOF_SOLUTION%RADMEANCH     =  0
+    EOF_SOLUTION%NLTE_COEF     =  0
   END SUBROUTINE INIT_PCRTM_EOF_SOLUTION
 
   SUBROUTINE CLEAR_PCRTM_EOF_SOLUTION(EOF_SOLUTION)
@@ -189,6 +192,7 @@ CONTAINS
                   EOF_SOLUTION%RADCH,                      &
                   EOF_SOLUTION%RADPC,                      &
                   EOF_SOLUTION%BTCH,                       &
+                  EOF_SOLUTION%NLTE_COEF,                  &
                   STAT = DEALLOC_STAT )                                  
     IF ( DEALLOC_STAT /= 0 ) THEN
        PRINT*,'ERROR TRYING TO DEALLOCATE EOF_SOLUTION'
@@ -262,7 +266,8 @@ CONTAINS
     EOF_SOLUTION_%RADCH    = EOF_SOLUTION%RADCH
     EOF_SOLUTION_%RADPC    = EOF_SOLUTION%RADPC(1:NPCBND)
     EOF_SOLUTION_%BTCH     = EOF_SOLUTION%BTCH
-
+    EOF_SOLUTION_%NLTE_COEF= EOF_SOLUTION%NLTE_COEF
+    
     DEALLOCATE(EOF_SOLUTION%INDX,                       &
                EOF_SOLUTION%FRQM,                       &
                EOF_SOLUTION%FRQCH,                      &
@@ -275,6 +280,7 @@ CONTAINS
                EOF_SOLUTION%RADCH,                      &
                EOF_SOLUTION%RADPC,                      &
                EOF_SOLUTION%BTCH,                       &
+               EOF_SOLUTION%NLTE_COEF,                  &
                STAT = DEALLOC_STAT )                                  
     IF ( DEALLOC_STAT /= 0 ) THEN
        PRINT*,'ERROR TRYING TO DEALLOCATE EOF_SOLUTION IN TRUNCATE_EOF_SOLUTION()'
@@ -297,6 +303,7 @@ CONTAINS
                EOF_SOLUTION_%RADCH,                      &
                EOF_SOLUTION_%RADPC,                      &
                EOF_SOLUTION_%BTCH,                       &
+               EOF_SOLUTION_%NLTE_COEF,                  &
                STAT = DEALLOC_STAT )                                  
     IF ( DEALLOC_STAT /= 0 ) THEN
        PRINT*,'ERROR TRYING TO DEALLOCATE EOF_SOLUTION_ IN TRUNCATE_EOF_SOLUTION'
@@ -306,23 +313,26 @@ CONTAINS
   END SUBROUTINE TRUNCATE_PCRTM_EOF_SOLUTION
 
 
-  SUBROUTINE RD_SENSOR_BND_INFO( EOF_SOLUTION, PARFILE )
+  SUBROUTINE RD_SENSOR_BND_INFO( EOF_SOLUTION, PARFILE, NLTEFILE )
     TYPE(PCRTM_EOF_SOLUTION_TYPE), &
                         ALLOCATABLE,INTENT(OUT) :: EOF_SOLUTION(:) 
     CHARACTER(160),                 INTENT(IN)  :: PARFILE
+    CHARACTER(160),                 INTENT(IN)  :: NLTEFILE
 
-    INTEGER :: IUPAR
+    INTEGER :: IUPAR, INLTE
     INTEGER :: NBND
     INTEGER :: NREG, NPCBND, NCHBND
     INTEGER :: IB, ALLOC_STAT
 
     CALL GETLUN(IUPAR)
-
     OPEN(UNIT=IUPAR,FILE=PARFILE,FORM='UNFORMATTED')
-
     PRINT*, PARFILE
     READ(IUPAR) NBND
     PRINT*, 'NUMBER OF BANDS', NBND
+
+    CALL GETLUN(INLTE)
+    PRINT*, NLTEFILE
+    OPEN(UNIT=INLTE,FILE=NLTEFILE)
 
     ALLOCATE(EOF_SOLUTION(NBND),STAT = ALLOC_STAT)
     IF ( ALLOC_STAT /= 0 ) THEN
@@ -346,9 +356,15 @@ CONTAINS
           EOF_SOLUTION(IB)%COEFMEAN(I)=                                     & 
           DOT_PRODUCT(EOF_SOLUTION(IB)%PC(I,:),EOF_SOLUTION(IB)%RADMEANCH)
        ENDDO
+       IF(EOF_SOLUTION(IB)%FRQCH(NCHBND) .GT. 2215.0) THEN
+          DO I = 1,NPCBND
+             READ(INLTE,*)EOF_SOLUTION(IB)%NLTE_COEF(I,:)
+          END DO
+       END IF
     END DO
     
     CLOSE(IUPAR)
+    CLOSE(INLTE)
 
   END SUBROUTINE RD_SENSOR_BND_INFO
 

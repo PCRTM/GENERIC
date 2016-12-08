@@ -126,7 +126,7 @@ MODULE PCRTM_SOLAR_PARAMETER
      REAL*4, allocatable :: MBRDFA(:,:,:,:)
      REAL*4, allocatable :: MBRDFB(:,:,:,:)
      REAL*4, allocatable :: Rdd_lut(:,:,:,:)
-     REAL*8,allocatable::de_lut(:),tau_lut(:),bottom_sky_tau_lut(:) 
+     REAL*8, allocatable ::de_lut(:),tau_lut(:),bottom_sky_tau_lut(:) 
      
   end type PCRTM_SOLAR_LUT_DEF
 
