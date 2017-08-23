@@ -1,0 +1,25 @@
+pcrtm_constants.o : pcrtm_constants.f90 pcrtm_type_kind.o
+pcrtm_math_utility.o : pcrtm_math_utility.f90 pcrtm_type_kind.o pcrtm_constants.o
+pcrtm_file_utilities.o : pcrtm_file_utilities.f90
+pcrtm_type_kind.o : pcrtm_type_kind.f90
+pcrtm_atm_absorption_io.o : pcrtm_atm_absorption_io.f90 pcrtm_file_utilities.o pcrtm_type_kind.o pcrtm_math_utility.o pcrtm_atm_absorption_define.o
+pcrtm_atm_absorption_define.o : pcrtm_atm_absorption_define.f90 pcrtm_type_kind.o
+pcrtm_atmosphere_define.o : pcrtm_atmosphere_define.f90 pcrtm_type_kind.o
+pcrtm_atmosphere_layer.o : pcrtm_atmosphere_layer.f90 pcrtm_atmosphere_define.o pcrtm_constants.o pcrtm_math_utility.o pcrtm_type_kind.o pcrtm_atm_absorption_define.o
+pcrtm_jaobian.o : pcrtm_jaobian.f90 pcrtm_type_kind.o pcrtm_atm_absorption_define.o
+pcrtm_solar_parameter.o : pcrtm_solar_parameter.f90
+pcrtm_solar_define.o : pcrtm_solar_define.f90  pcrtm_atm_absorption_define.o pcrtm_file_utilities.o pcrtm_type_kind.o pcrtm_math_utility.o
+pcrtm_solar_rt.o : pcrtm_solar_rt.f90 pcrtm_solar_parameter.o pcrtm_solar_define.o  	
+pcrtm_atm_absorption.o : pcrtm_atm_absorption.f90 pcrtm_atmosphere_define.o pcrtm_jacobian.o pcrtm_atm_absorption_define.o pcrtm_type_kind.o pcrtm_atmosphere_layer.o pcrtm_rt_solution_define.o
+pcrtm_rt_solution_define.o : pcrtm_rt_solution_define.f90 pcrtm_atm_absorption_define.o
+pcrtm_calc_rad.o : pcrtm_calc_rad.f90 pcrtm_math_utility.o pcrtm_atm_absorption_define.o pcrtm_jacobian.o pcrtm_cloud_define.o pcrtm_type_kind.o pcrtm_rt_solution_define.o
+pcrtm_cloud_define.o : pcrtm_cloud_define.f90 pcrtm_type_kind.o pcrtm_jacobian.o
+pcrtm_cloud_lut_io.o : pcrtm_coud_lut_io.f90 pcrtm_file_utilities.o pcrtm_type_kind.o
+pcrtm_cloud_lut_interp.o : pcrtm_cloud_lut_interp.f90 pcrtm_type_kind.o pcrtm_cloud_lut_io.o pcrtm_cloud_define.o pcrtm_math_utility.o
+pcrtm_calc_cloud.o : pcrtm_calc_cloud.f90 pcrtm_cloud_define.o pcrtm_atm_absorption_define.o pcrtm_atmosphere_define.o pcrtm_math_utility.o pcrtm_cloud_lut_io.o pcrtm_cloud_lut_interp.o pcrtm_jacobian.o
+pcrtm_pc_solution.o : pcrtm_pc_solution.f90 pcrtm_file_utilities.o pcrtm_type_kind.o pcrtm_rt_solution_define.o pcrtm_constants.o pcrtm_jacobian.o
+pcrtm_struct_mod.o : pcrtm_struct_mod.f90 pcrtm_atm_absorption_define.o pcrtm_cloud_lut_io.o pcrtm_pc_solution.o pcrtm_math_utility.o pcrtm_type_kind.o	
+init_pcrtm.o : init_pcrtm.f90 pcrtm_type_kind.o pcrtm_atm_absorption_io.o pcrtm_cloud_lut_io.o pcrtm_atmosphere_define.o pcrtm_rt_solution_define.o pcrtm_jacobian.o pcrtm_eof_solution.o  pcrtm_struct_wn_convert.o clear_pcrtm.o pcrtm_weight_solution.o
+clear_pcrtm.o : clear_pcrtm.f90 pcrtm_atm_absorption_define.o pcrtm_cloud_lut_io.o pcrtm_atmosphere_define.o pcrtm_rt_solution_define.o pcrtm_jacobian.o pcrtm_eof_solution.o pcrtm_weight_solution.o pcrtm_solar_define.o
+pcrtm_forward_model.o : pcrtm_forward_model.f90 pcrtm_atmosphere_layer.o pcrtm_atm_absorption.o pcrtm_jacobian.o pcrtm_rt_solution_define.o pcrtm_calc_rad.o pcrtm_calc_cloud.o pcrtm_pc_solution.o pcrtm_weight_solution.o pcrtm_tr_solution.o
+pcrtm_tr_solution.o : pcrtm_tr_solution.f90 pcrtm_math_utility.o pcrtm_type_kind.o pcrtm_rt_solution_define.o  pcrtm_pc_solution.o
