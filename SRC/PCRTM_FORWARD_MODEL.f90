@@ -272,7 +272,11 @@ CONTAINS
     
     INTEGER                                         :: IB, NB
 
+<<<<<<< HEAD
     REAL*4                                    :: mu0, avgT
+=======
+    REAL*4                                    :: mu0
+>>>>>>> fe89b70811fe53e2d6b806e1561a8c7c67c4a875
 
     NB = SIZE(EOF_SOLUTION)
 
@@ -281,6 +285,7 @@ CONTAINS
        IF (GEOMETRY%pobs .lt. 20 .and. EOF_SOLUTION(IB)%FRQCH(EOF_SOLUTION(IB)%NCHBND) .gt. &
             2215.0 .and. GEOMETRY%SOLAR_ZANG .lt. 90.0) then
           write(*,*) 'calcualting nlte for band-------', IB
+<<<<<<< HEAD
           mu0 = cos(GEOMETRY%SOLAR_ZANG*pi/180.0)
           avgT=sum(ATM%tlev(1:5))/5
           EOF_SOLUTION(IB)%radpc = EOF_SOLUTION(IB)%radpc + (EOF_SOLUTION(IB)%nlte_coef(:,1) + &
@@ -290,6 +295,15 @@ CONTAINS
                mu0 + EOF_SOLUTION(IB)%nlte_coef(:,7)*(ATM%vmr(1,2)-370.0))*1.2
        end if
 
+=======
+          mu0 = cos(GEOMETRY%SOLAR_ZANG)
+          EOF_SOLUTION(IB)%radpc = EOF_SOLUTION(IB)%radpc + EOF_SOLUTION(IB)%nlte_coef(:,1) + &
+               EOF_SOLUTION(IB)%nlte_coef(:,2)*mu0 + EOF_SOLUTION(IB)%nlte_coef(:,3)*mu0*mu0+ &
+               EOF_SOLUTION(IB)%nlte_coef(:,4)*mu0/cos(GEOMETRY%satang) +                     &
+               EOF_SOLUTION(IB)%nlte_coef(:,5)*ATM%tlev(1) + EOF_SOLUTION(IB)%nlte_coef(:,6)* &
+               mu0 + EOF_SOLUTION(IB)%nlte_coef(:,7)*(ATM%tlev(1)-370.0)
+       end if
+>>>>>>> fe89b70811fe53e2d6b806e1561a8c7c67c4a875
        IF(EOF_SOLUTION(IB)%CHDOMAIN) THEN
           CALL PCSCORE2CH(EOF_SOLUTION(IB))
        END IF

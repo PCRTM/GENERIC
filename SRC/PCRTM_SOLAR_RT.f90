@@ -109,8 +109,12 @@ Module PCRTM_SOLAR_RT
   USE  PCRTM_RT_SOLUTION_define,only :  PCRTM_RT_SOLUTION_TYPE
   USE  PCRTM_CLOUD_DEFINE, ONLY   : PCRTM_CLOUD_TYPE
   USE  PCRTM_ATMOSPHERE_LAYER, only : PCRTM_GEOMETRY_TYPE
+<<<<<<< HEAD
   USE  PCRTM_math_utility, only : linxlinp
 
+=======
+  
+>>>>>>> fe89b70811fe53e2d6b806e1561a8c7c67c4a875
 contains
 
   subroutine PCRTM_FORWARD_RT_M_Solar ( RT_SOLUTION,     &
@@ -119,15 +123,22 @@ contains
                                         CLD,             &
                                         Geometry,        &
                                         Solar_tab,       &
+<<<<<<< HEAD
                                         SOLAR_SOLUTION )
     Type(PCRTM_SOLAR_DEF),             INTENT(inout) :: SOLAR_SOLUTION
     TYPE(PCRTM_RT_SOLUTION_TYPE),      INTENT(inout) :: RT_SOLUTION
+=======
+                                        SOLAR_SOLUTION)
+    Type(PCRTM_SOLAR_DEF),             INTENT(inout) :: SOLAR_SOLUTION
+    TYPE(PCRTM_RT_SOLUTION_TYPE),      INTENT(in)    :: RT_SOLUTION
+>>>>>>> fe89b70811fe53e2d6b806e1561a8c7c67c4a875
     TYPE(PCRTM_ATM_ABS_STRUCT_TYPE),   INTENT(IN)    :: PCRTM_STND
     integer,                           INTENT(in)    :: NCLD
     TYPE(PCRTM_CLOUD_TYPE),            INTENT(in)    :: CLD(NCLD)
     TYPE(PCRTM_GEOMETRY_TYPE),         INTENT(in)    :: Geometry
     type(PCRTM_SOLAR_LUT_DEF),         intent(in)    :: solar_tab(2)
 
+<<<<<<< HEAD
     integer  ::  phase,n, StartWaveIndex
     real*8   ::  ctau, de, weight
     real*4   ::  pcld_i, pcld_w, pcld
@@ -331,12 +342,70 @@ contains
     mu0     = COS(Geometry%solar_zang*pi/180.0)
 
        
+=======
+    TYPE(PCRTM_CLOUD_TYPE)   :: CLD0(NCLD)
+    integer  ::  StartWaveIndex
+    real*4   ::  wavenumber, tau_above, tau_below, tau,R_TOA,R_TOA0
+    real*8   ::  view_mu, mu0, albedo
+    
+
+    StartWaveIndex = SOLAR_SOLUTION%StartWaveIndex
+    view_mu = COS(Geometry%satang*pi/180.0)
+    mu0     = COS(Geometry%solar_zang*pi/180.0)
+
+!!!! Assign LUTs according to cloud type.
+    IF (NCLD .GT. 0) then
+       IF( cld(1)%vistau .ge. 1e-2) THEN
+          IF (cld(1)%phase == 1) THEN
+             CALL R_T_INTPOL(RT_SOLUTION,                        &
+                             NCLD,                               &
+                             CLD,                                &
+                             Geometry,                           &
+                             Solar_tab(1),                       &
+                             SOLAR_SOLUTION,                     &
+                             PCRTM_Stnd)
+          ELSE IF (cld(1)%phase == 2) THEN
+             CALL R_T_INTPOL(RT_SOLUTION,                        &
+                             NCLD,                               &
+                             CLD,                                &
+                             Geometry,                           &
+                             Solar_tab(2),                       &
+                             SOLAR_SOLUTION,                     &
+                             PCRTM_Stnd)
+          END IF
+       else
+          CLD0 = CLD
+          cld0(1)%vistau = 0.01
+          IF (cld(1)%phase == 1) THEN
+             CALL R_T_INTPOL(RT_SOLUTION,                        &
+                             NCLD,                               &
+                             CLD0,                               &
+                             Geometry,                           &
+                             Solar_tab(1),                       &
+                             SOLAR_SOLUTION,                     &
+                             PCRTM_Stnd)
+          ELSE IF (cld(1)%phase == 2) THEN
+             CALL R_T_INTPOL(RT_SOLUTION,                        &
+                             NCLD,                               &
+                             CLD0,                               &
+                             Geometry,                           &
+                             Solar_tab(2),                       &
+                             SOLAR_SOLUTION,                     &
+                             PCRTM_Stnd)
+          END IF
+          
+       END IF
+    end IF
+    
+    SOLAR_SOLUTION%SolarRadUp = 0.0
+>>>>>>> fe89b70811fe53e2d6b806e1561a8c7c67c4a875
     DO iwave = 1, pcrtm_stnd%nM - StartWaveIndex + 1
        wavenumber = pcrtm_stnd%frq(iwave+StartWaveIndex-1)
        IF ((wavenumber .LT. 1800.00) .OR. (wavenumber .GT. 3000.00)) THEN
           PRINT *, 'Wavenumber must be larger than 1800 and smaller than 3000!'
           STOP
        ENDIF
+<<<<<<< HEAD
        
        albedo    = 1.0 - RT_SOLUTION%EMIS(iwave+StartWaveIndex-1)
        
@@ -344,6 +413,15 @@ contains
           tau = sum(RT_SOLUTION%TAUlay(iwave+StartWaveIndex-1,:))+1e-20
           R_TOA = albedo*exp(-tau/mu0)*exp(-tau/view_mu)
        else if (CTAU .le. 1e-2) THEN
+=======
+
+       albedo    = 1.0 - RT_SOLUTION%EMIS(iwave+StartWaveIndex-1)
+       
+       IF (NCLD .EQ. 0) then
+          tau = sum(RT_SOLUTION%TAUlay(iwave+StartWaveIndex-1,:))+1e-20
+          R_TOA = albedo*exp(-tau/mu0)*exp(-tau/view_mu)
+       else if (cld(1)%vistau .le. 1e-2) THEN
+>>>>>>> fe89b70811fe53e2d6b806e1561a8c7c67c4a875
           tau = sum(RT_SOLUTION%TAUlay(iwave+StartWaveIndex-1,:))+1e-20
           R_TOA0 = albedo*exp(-tau/mu0)*exp(-tau/view_mu)
           tau_above = RT_SOLUTION%Taugas_above(iwave+StartWaveIndex-1)+1e-20
@@ -351,7 +429,11 @@ contains
           R_TOA = (SOLAR_SOLUTION%BRDF(iwave) + albedo*SOLAR_SOLUTION%Tbd(iwave)&
                *SOLAR_SOLUTION%Tdb(iwave)/(1-albedo*SOLAR_SOLUTION%Rdd(iwave)/pi))*&
                exp(-tau_above/view_mu)*exp(-tau_above/mu0)
+<<<<<<< HEAD
           R_TOA = R_TOA0+ (R_TOA-R_TOA0)*CTAU/0.01
+=======
+          R_TOA = R_TOA0+ (R_TOA-R_TOA0)*CLD(1)%vistau/0.01
+>>>>>>> fe89b70811fe53e2d6b806e1561a8c7c67c4a875
        ELSE
           tau_above = RT_SOLUTION%Taugas_above(iwave+StartWaveIndex-1)+1e-20
           tau_below = RT_SOLUTION%Taugas_below(iwave+StartWaveIndex-1)+1e-20
@@ -362,6 +444,7 @@ contains
        SOLAR_SOLUTION%SolarRadUp(iwave) = 1000.0*mu0*SOLAR_SOLUTION%SolarSpectrum(iwave)*R_TOA/pi
     end DO
 
+<<<<<<< HEAD
   end subroutine PCRTM_1CLD_Solar_scatter
    
 
@@ -369,6 +452,15 @@ contains
   subroutine R_T_INTPOL(RT_SOLUTION,                    &
                         CTAU,                           &
                         DE,                             &
+=======
+
+  end subroutine PCRTM_FORWARD_RT_M_SOLAR
+
+
+  subroutine R_T_INTPOL(RT_SOLUTION,                    &
+                        NCLD,                           &
+                        CLD,                            &
+>>>>>>> fe89b70811fe53e2d6b806e1561a8c7c67c4a875
                         Geometry,                       &
                         Solar_tab,                      &      
                         SOLAR_SOLUTION,                 &
@@ -377,9 +469,16 @@ contains
     Type(PCRTM_SOLAR_DEF),          INTENT(inout) :: SOLAR_SOLUTION
     TYPE(PCRTM_RT_SOLUTION_TYPE),      INTENT(in) :: RT_SOLUTION
     TYPE(PCRTM_ATM_ABS_STRUCT_TYPE),   INTENT(IN) :: PCRTM_STND
+<<<<<<< HEAD
     TYPE(PCRTM_GEOMETRY_TYPE),         INTENT(in) :: Geometry
     type(PCRTM_SOLAR_LUT_DEF),         intent(in) :: solar_tab
     REAL*8,                           intent(in)  :: ctau, De
+=======
+    integer,                           INTENT(in) :: NCLD
+    TYPE(PCRTM_CLOUD_TYPE),            INTENT(in) :: CLD(NCLD)
+    TYPE(PCRTM_GEOMETRY_TYPE),         INTENT(in) :: Geometry
+    type(PCRTM_SOLAR_LUT_DEF),         intent(in) :: solar_tab
+>>>>>>> fe89b70811fe53e2d6b806e1561a8c7c67c4a875
 
 
 !!$    REAL*8, DIMENSION(numberfreqbins), INTENT(OUT) :: BRDF, Rdd, Tbd, Tdb
@@ -392,6 +491,10 @@ contains
     REAL*8, allocatable :: BRDF_grid(:) !DIMENSION(end_freqgrid_index)
 
     INTEGER :: start_freqgrid_index, end_freqgrid_index, numberfreqbins,StartWaveIndex
+<<<<<<< HEAD
+=======
+    REAL*8  :: ctau, De
+>>>>>>> fe89b70811fe53e2d6b806e1561a8c7c67c4a875
     REAL*8  :: SZA, VZA
 
 
@@ -422,7 +525,12 @@ contains
 !!$                      BRDF, Rdd, Tbd, Tdb)
 
 
+<<<<<<< HEAD
 
+=======
+    ctau = cld(1)%vistau
+    De   = cld(1)%De
+>>>>>>> fe89b70811fe53e2d6b806e1561a8c7c67c4a875
     SZA  = Geometry%solar_zang
     VZA  = Geometry%satang
     VAA  = Geometry%sat_azimuth-Geometry%solar_azimuth

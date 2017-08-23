@@ -140,7 +140,11 @@ Contains
 
     nfrq = pcrtm_stnd%nM - StartWaveIndex + 1 
 
+<<<<<<< HEAD
     allocate( PCRTM_SOLAR_SOLUTION%SolarSpectrum(NFRQ),          &
+=======
+    allocate( PCRTM_SOLAR_SOLUTION%SolarSpectrum(NFRQ),         &
+>>>>>>> fe89b70811fe53e2d6b806e1561a8c7c67c4a875
               PCRTM_SOLAR_SOLUTION%SolarRadUp(NFRQ),             &
               PCRTM_SOLAR_SOLUTION%BRDF(NFRQ),                   &
               PCRTM_SOLAR_SOLUTION%TDB(NFRQ),                    &
@@ -151,11 +155,19 @@ Contains
        PRINT*,'ERROR TRYING TO ALLOCATE PCRTM_SOLAR_SOLUTION'
        STOP
     ENDIF
+<<<<<<< HEAD
     PCRTM_SOLAR_SOLUTION%BRDF      =0
     PCRTM_SOLAR_SOLUTION%TDB       =0
     PCRTM_SOLAR_SOLUTION%TBD       =0
     PCRTM_SOLAR_SOLUTION%RDD       =0
     PCRTM_SOLAR_SOLUTION%SolarRadUp=0
+=======
+    PCRTM_SOLAR_SOLUTION%BRDF     =0
+    PCRTM_SOLAR_SOLUTION%TDB      =0
+    PCRTM_SOLAR_SOLUTION%TBD      =0
+    PCRTM_SOLAR_SOLUTION%RDD      =0
+
+>>>>>>> fe89b70811fe53e2d6b806e1561a8c7c67c4a875
 
     CALL GETLUN(IO)
     OPEN(IO,FILE='INPUTDIR/Solar_Spectrum_1800_3000.txt')
