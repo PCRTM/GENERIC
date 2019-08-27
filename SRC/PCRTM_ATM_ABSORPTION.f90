@@ -208,36 +208,8 @@ MODULE PCRTM_ATM_ABSORPTION
            
            RT_SOLUTION%TRLAY(IM,I1)     = EXP(-TAU*GEOMETRY%SECZANG)+1e-10
            RT_SOLUTION%TAULAY(IM,I1)    = TAU
-<<<<<<< HEAD
         ENDDO                  !IM LOOP
 
-!!$        IF ( I1 .gt.1 ) then
-!!$           IF(ATM%CLD_FLAG(I1-1) .GT.0 ) THEN
-!!$              DO IM = 1, PCRTM_STND%nM
-!!$                 CALL LOGXLOGP(RT_SOLUTION%TAULAY(im,I1-1),RT_SOLUTION%TAULAY(IM,I1),PCRTM_STND%PBND(I1-1),&
-!!$                      PCRTM_STND%PBND(I1),ATM%PCLD(I1-1),TAU)
-!!$                 RT_SOLUTION%TAUGAS_ABOVE(im) = sum(RT_SOLUTION%TAUlay(IM,1:I1-2))+TAU
-!!$                 RT_SOLUTION%TAUGAS_BELOW(im) = sum(RT_SOLUTION%TAUlay(IM,I1-1:PCRTM_STND%NLAY))-TAU
-!!$              END DO
-!!$           END IF
-!!$        end IF
-=======
-!!$           write(1111,*) RT_SOLUTION%TRLAY(IM,I1), TAU
-
-        ENDDO                  !IM LOOP
-
-        IF ( I1 .gt.1 ) then
-           IF(ATM%CLD_FLAG(I1-1) .GT.0 ) THEN
-              DO IM = 1, PCRTM_STND%nM
-                 CALL LOGXLOGP(RT_SOLUTION%TAULAY(im,I1-1),RT_SOLUTION%TAULAY(IM,I1),PCRTM_STND%PBND(I1-1),&
-                      PCRTM_STND%PBND(I1),ATM%PCLD(I1-1),TAU)
-                 RT_SOLUTION%TAUGAS_ABOVE(im) = sum(RT_SOLUTION%TAUlay(IM,1:I1-2))+TAU
-                 RT_SOLUTION%TAUGAS_BELOW(im) = sum(RT_SOLUTION%TAUlay(IM,I1-1:PCRTM_STND%NLAY))-TAU
-!!$                 write(1112,*) RT_SOLUTION%Taulay(im,I1-1),RT_SOLUTION%Taulay(im,I1),PCRTM_STND%PBND(I1-1),PCRTM_STND%PBND(I1),ATM%PCLD(I1-1),Tau
-              END DO
-           END IF
-        end IF
->>>>>>> fe89b70811fe53e2d6b806e1561a8c7c67c4a875
 
         RT_SOLUTION%TRTOP2LV(:,I1+1) = RT_SOLUTION%TRTOP2LV(:,I1)*RT_SOLUTION%TRLAY(:,I1) 
         RT_SOLUTION%BLAY(:,I1)   = PLANCK(PCRTM_STND%FRQ,ATM%TLAY(I1),PCRTM_STND%NM)
